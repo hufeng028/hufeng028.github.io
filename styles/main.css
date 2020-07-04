@@ -526,6 +526,8 @@ a {
   background: #343a40;
   color: #f1f3f5;
   display: block;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 .post-detail .post-content pre code:after {
   content: 'CODE';

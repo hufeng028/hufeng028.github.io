@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://hufeng028.github.io</id>
     <title>一念觀心</title>
-    <updated>2020-07-04T11:27:22.074Z</updated>
+    <updated>2020-07-04T14:36:56.237Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://hufeng028.github.io"/>
     <link rel="self" href="https://hufeng028.github.io/atom.xml"/>
@@ -53,6 +53,16 @@ ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that 
 </code></pre>
 <blockquote>
 <p>一般语法错误会提示第一个出现错误的位置，关注紧接“user near”的内容。</p>
+</blockquote>
+<h3 id="优化器">优化器</h3>
+<p>优化器决定多索引时使用哪个索引、多表关联的表连接顺序，在多种执行逻辑中选择哪个方案。</p>
+<h3 id="执行器">执行器</h3>
+<p>开始执行时，先判断有没有对表有没有执行权限。</p>
+<blockquote>
+<p>慢查询日志中字段<code>rows_examined</code>表示执行过程中扫描行数，但并不是完全相同。</p>
+</blockquote>
+<blockquote>
+<p>分析器中会验证表涉及到的表、字段是否存在</p>
 </blockquote>
 ]]></content>
     </entry>

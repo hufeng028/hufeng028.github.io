@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hufeng028.github.io/favicon.ico?v=1593862012651">
+<link rel="shortcut icon" href="https://hufeng028.github.io/favicon.ico?v=1593873383362">
 <link rel="stylesheet" href="https://hufeng028.github.io/styles/main.css">
 
 
@@ -33,7 +33,7 @@ Server层包括： 连接器、查询缓存、分析器、优化器、执行器�
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://hufeng028.github.io">
-        <img src="https://hufeng028.github.io/images/avatar.png?v=1593862012651" class="site-logo">
+        <img src="https://hufeng028.github.io/images/avatar.png?v=1593873383362" class="site-logo">
         <h1 class="site-title">一念觀心</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -63,12 +63,6 @@ Server层包括： 连接器、查询缓存、分析器、优化器、执行器�
         
           <a href="/tags" class="site-nav">
             标签
-          </a>
-        
-      
-        
-          <a href="/post/about" class="site-nav">
-            关于
           </a>
         
       
@@ -142,6 +136,16 @@ ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that 
 </code></pre>
 <blockquote>
 <p>一般语法错误会提示第一个出现错误的位置，关注紧接“user near”的内容。</p>
+</blockquote>
+<h3 id="优化器">优化器</h3>
+<p>优化器决定多索引时使用哪个索引、多表关联的表连接顺序，在多种执行逻辑中选择哪个方案。</p>
+<h3 id="执行器">执行器</h3>
+<p>开始执行时，先判断有没有对表有没有执行权限。</p>
+<blockquote>
+<p>慢查询日志中字段<code>rows_examined</code>表示执行过程中扫描行数，但并不是完全相同。</p>
+</blockquote>
+<blockquote>
+<p>分析器中会验证表涉及到的表、字段是否存在</p>
 </blockquote>
 
             </div>
