@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://hufeng028.github.io</id>
     <title>一念觀心</title>
-    <updated>2020-07-04T15:03:48.677Z</updated>
+    <updated>2020-07-05T02:30:32.198Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://hufeng028.github.io"/>
     <link rel="self" href="https://hufeng028.github.io/atom.xml"/>
@@ -10,6 +10,80 @@
     <logo>https://hufeng028.github.io/images/avatar.png</logo>
     <icon>https://hufeng028.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 一念觀心</rights>
+    <entry>
+        <title type="html"><![CDATA[22 | MySQL有哪些“饮鸩止渴”提高性能的方法？]]></title>
+        <id>https://hufeng028.github.io/22-or-mysql-you-na-xie-yin-zhen-zhi-ke-ti-gao-xing-neng-de-fang-fa/</id>
+        <link href="https://hufeng028.github.io/22-or-mysql-you-na-xie-yin-zhen-zhi-ke-ti-gao-xing-neng-de-fang-fa/">
+        </link>
+        <updated>2020-07-04T15:06:34.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="短连接风暴">短连接风暴</h3>
+<ul>
+<li>参数<code>max_connections</code>控制MySQL实例同时存在的连接数上限。<br>
+短连接模型风险，数据库处理得慢一些，连接数就会暴涨。就可能超过<code>max_connections</code>的限制。</li>
+</ul>
+<p>有损解决方法：</p>
+<h4 id="1-先处理掉那些占着连接但不工作的线程">1. 先处理掉那些占着连接但不工作的线程</h4>
+<ul>
+<li>踢掉<code>show processlist</code>的结果里显示为Sleep的线程，可能是有损的。<br>
+<img src="https://hufeng028.github.io/post-images/1593877304450.png" alt="" loading="lazy"></li>
+<li>结合<code>information_schema</code>库的<code>innodb_trx</code>表<br>
+<img src="https://hufeng028.github.io/post-images/1593876203189.png" alt="" loading="lazy"></li>
+</ul>
+<blockquote>
+<p>结果里<code>trx_mysql_thread_id = 4</code>，标识<code>id = 4</code>的线程还处在事务中。</p>
+</blockquote>
+<ul>
+<li>服务器端断开连接使用<code>kill connection + id</code>命令</li>
+</ul>
+<blockquote>
+<p>优先断开事务外空闲太久的连接，如果不够，再考虑断开事务空闲太久的连接。</p>
+</blockquote>
+<h4 id="2-减少连接过程的消耗">2. 减少连接过程的消耗</h4>
+<p>重启数据库，并使用<code>--skip-grant-tables</code>参数，让整个MySQL跳过所有的权限验证，包括连接过程和语句执行过程在内。</p>
+<blockquote>
+<p>MySQL 8.0，当启用<code>--skip-grant-tables</code>参数，MySQL会默认把<code>--skip-networking</code>参数打开，使数据库只能被本地的客户端连接。</p>
+</blockquote>
+<h3 id="慢查询性能问题">慢查询性能问题</h3>
+<h4 id="1-索引没设计好">1. 索引没设计好</h4>
+<p>紧急创建索引来解决。</p>
+<blockquote>
+<p>一主一备（A主，B备）执行流程：<br>
+第一步：备库B上执行<code>set sql_log_bin=off</code>，关闭binlog，执行<code>alter table ...</code>语句添加索引<br>
+第二步：执行主备切换<br>
+第三步：备库A上执行<code>set sql_log_bin=off</code>，关闭binlog，执行<code>alter table ...</code>语句添加索引</p>
+</blockquote>
+<h4 id="2-sql语句没写好">2. SQL语句没写好</h4>
+<p>查询重写：使用存储过程<code>call query_rewrite.flush_rewrite_rules()</code>，让新规则生效。</p>
+<pre><code class="language-mysql">
+mysql&gt; insert into query_rewrite.rewrite_rules(pattern, replacement, pattern_database) values (&quot;select * from t where id + 1 = ?&quot;, &quot;select * from t where id = ? - 1&quot;, &quot;db1&quot;);
+
+call query_rewrite.flush_rewrite_rules();
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://hufeng028.github.io/post-images/1593878319608.png" alt="" loading="lazy"></figure>
+<ul>
+<li>MySQL选错索引<br>
+在语句上添加<code>force index</code></li>
+</ul>
+<blockquote>
+<p>预先发现问题：</p>
+<ol>
+<li>上线前，在测试环境，打开慢查询日志（show log），并将<code>long_query_time</code>设置为0，确保每条语句都会被记录慢查询日志；</li>
+<li>在测试表里插入模拟线上数据，做一遍回归测试；</li>
+<li>观察慢查询日志里每类语句输出，特别留意<code>Rows_examined</code>字段是否与预期一致；</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>检查所有SQL语句返回结果工具，<a href="https://www.percona.com/doc/percona-toolkit/3.0/pt-query-digest.html">pt-query-digest</a></p>
+</blockquote>
+<h3 id="qps突增问题">QPS突增问题</h3>
+<blockquote>
+<p>QPS（Query Per Second）意思是“每秒查询率”，是一台服务器每秒能够响应的查询次数，是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准，计算公式：QPS = 并发量 / 平均响应时间。</p>
+</blockquote>
+<ul>
+<li>依赖规范的运维体系，虚拟化、白名单机制、业务账号分离来隔离或下线有bug业务。</li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[21 | 为什么我只改一行的语句，锁这么多？]]></title>
         <id>https://hufeng028.github.io/21-or-wei-shi-me-wo-zhi-gai-yi-xing-de-yu-ju-suo-zhe-me-duo/</id>
@@ -88,15 +162,6 @@
         <link href="https://hufeng028.github.io/13-or-wei-shi-me-biao-shu-ju-shan-diao-yi-ban-biao-wen-jian-da-xiao-bu-bian/">
         </link>
         <updated>2020-07-04T14:55:25.000Z</updated>
-        <content type="html"><![CDATA[<p>...</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[12 | 为什么我的MySQL会“抖”一下？]]></title>
-        <id>https://hufeng028.github.io/12-or-wei-shi-me-wo-de-mysql-hui-dou-yi-xia/</id>
-        <link href="https://hufeng028.github.io/12-or-wei-shi-me-wo-de-mysql-hui-dou-yi-xia/">
-        </link>
-        <updated>2020-07-04T14:54:48.000Z</updated>
         <content type="html"><![CDATA[<p>...</p>
 ]]></content>
     </entry>

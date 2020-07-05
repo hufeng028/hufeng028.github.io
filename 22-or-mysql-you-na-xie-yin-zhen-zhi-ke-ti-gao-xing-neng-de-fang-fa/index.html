@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>22 | MySQL有哪些“饮鸩止渴”提高性能的方法？ | 一念觀心</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://hufeng028.github.io/favicon.ico?v=1593916227174">
+<link rel="stylesheet" href="https://hufeng028.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="短连接风暴
+
+参数max_connections控制MySQL实例同时存在的连接数上限。
+短连接模型风险，数据库处理得慢一些，连接数就会暴涨。就可能超过max_connections的限制。
+
+有损解决方法：
+1. 先处理掉那些占着连接但不..." />
+    <meta name="keywords" content="mysql" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://hufeng028.github.io">
+        <img src="https://hufeng028.github.io/images/avatar.png?v=1593916227174" class="site-logo">
+        <h1 class="site-title">一念觀心</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/XAK52Yt-j/" class="site-nav">
+            MySQL
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      凡事有交代，件件有着落，事事有回音。
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://hufeng028.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">22 | MySQL有哪些“饮鸩止渴”提高性能的方法？</h2>
+            <div class="post-date">2020-07-04</div>
+            
+            <div class="post-content" v-pre>
+              <h3 id="短连接风暴">短连接风暴</h3>
+<ul>
+<li>参数<code>max_connections</code>控制MySQL实例同时存在的连接数上限。<br>
+短连接模型风险，数据库处理得慢一些，连接数就会暴涨。就可能超过<code>max_connections</code>的限制。</li>
+</ul>
+<p>有损解决方法：</p>
+<h4 id="1-先处理掉那些占着连接但不工作的线程">1. 先处理掉那些占着连接但不工作的线程</h4>
+<ul>
+<li>踢掉<code>show processlist</code>的结果里显示为Sleep的线程，可能是有损的。<br>
+<img src="https://hufeng028.github.io/post-images/1593877304450.png" alt="" loading="lazy"></li>
+<li>结合<code>information_schema</code>库的<code>innodb_trx</code>表<br>
+<img src="https://hufeng028.github.io/post-images/1593876203189.png" alt="" loading="lazy"></li>
+</ul>
+<blockquote>
+<p>结果里<code>trx_mysql_thread_id = 4</code>，标识<code>id = 4</code>的线程还处在事务中。</p>
+</blockquote>
+<ul>
+<li>服务器端断开连接使用<code>kill connection + id</code>命令</li>
+</ul>
+<blockquote>
+<p>优先断开事务外空闲太久的连接，如果不够，再考虑断开事务空闲太久的连接。</p>
+</blockquote>
+<h4 id="2-减少连接过程的消耗">2. 减少连接过程的消耗</h4>
+<p>重启数据库，并使用<code>--skip-grant-tables</code>参数，让整个MySQL跳过所有的权限验证，包括连接过程和语句执行过程在内。</p>
+<blockquote>
+<p>MySQL 8.0，当启用<code>--skip-grant-tables</code>参数，MySQL会默认把<code>--skip-networking</code>参数打开，使数据库只能被本地的客户端连接。</p>
+</blockquote>
+<h3 id="慢查询性能问题">慢查询性能问题</h3>
+<h4 id="1-索引没设计好">1. 索引没设计好</h4>
+<p>紧急创建索引来解决。</p>
+<blockquote>
+<p>一主一备（A主，B备）执行流程：<br>
+第一步：备库B上执行<code>set sql_log_bin=off</code>，关闭binlog，执行<code>alter table ...</code>语句添加索引<br>
+第二步：执行主备切换<br>
+第三步：备库A上执行<code>set sql_log_bin=off</code>，关闭binlog，执行<code>alter table ...</code>语句添加索引</p>
+</blockquote>
+<h4 id="2-sql语句没写好">2. SQL语句没写好</h4>
+<p>查询重写：使用存储过程<code>call query_rewrite.flush_rewrite_rules()</code>，让新规则生效。</p>
+<pre><code class="language-mysql">
+mysql&gt; insert into query_rewrite.rewrite_rules(pattern, replacement, pattern_database) values (&quot;select * from t where id + 1 = ?&quot;, &quot;select * from t where id = ? - 1&quot;, &quot;db1&quot;);
+
+call query_rewrite.flush_rewrite_rules();
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://hufeng028.github.io/post-images/1593878319608.png" alt="" loading="lazy"></figure>
+<ul>
+<li>MySQL选错索引<br>
+在语句上添加<code>force index</code></li>
+</ul>
+<blockquote>
+<p>预先发现问题：</p>
+<ol>
+<li>上线前，在测试环境，打开慢查询日志（show log），并将<code>long_query_time</code>设置为0，确保每条语句都会被记录慢查询日志；</li>
+<li>在测试表里插入模拟线上数据，做一遍回归测试；</li>
+<li>观察慢查询日志里每类语句输出，特别留意<code>Rows_examined</code>字段是否与预期一致；</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>检查所有SQL语句返回结果工具，<a href="https://www.percona.com/doc/percona-toolkit/3.0/pt-query-digest.html">pt-query-digest</a></p>
+</blockquote>
+<h3 id="qps突增问题">QPS突增问题</h3>
+<blockquote>
+<p>QPS（Query Per Second）意思是“每秒查询率”，是一台服务器每秒能够响应的查询次数，是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准，计算公式：QPS = 并发量 / 平均响应时间。</p>
+</blockquote>
+<ul>
+<li>依赖规范的运维体系，虚拟化、白名单机制、业务账号分离来隔离或下线有bug业务。</li>
+</ul>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://hufeng028.github.io/XAK52Yt-j/" class="tag">
+                    mysql
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://hufeng028.github.io/21-or-wei-shi-me-wo-zhi-gai-yi-xing-de-yu-ju-suo-zhe-me-duo/">
+                  <h3 class="post-title">
+                    21 | 为什么我只改一行的语句，锁这么多？
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
