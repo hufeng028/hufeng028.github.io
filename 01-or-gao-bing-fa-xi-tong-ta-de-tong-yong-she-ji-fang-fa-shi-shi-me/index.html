@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>16 | “order by”是怎么工作的？ | 一念觀心</title>
+<title>01 | 高并发系统：它的通用设计方法是什么？ | 一念觀心</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,9 +18,12 @@
 
 
 
-    <meta name="description" content="...
-" />
-    <meta name="keywords" content="mysql" />
+    <meta name="description" content="应对高并发大流量三种方法：
+
+Scale-out（横向扩展）： 采用分布式部署的方式把流量分流开，让每个服务器承担一部分并发和流量。
+缓存： 使用缓存来提高系统的性能。
+异步 在某些场景下，未处理完让请求先返回，数据准备好之后，再通知请求方..." />
+    <meta name="keywords" content="高并发" />
   </head>
   <body>
     <div id="app" class="main">
@@ -91,18 +94,38 @@
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">16 | “order by”是怎么工作的？</h2>
-            <div class="post-date">2020-07-04</div>
+            <h2 class="post-title">01 | 高并发系统：它的通用设计方法是什么？</h2>
+            <div class="post-date">2020-07-06</div>
             
             <div class="post-content" v-pre>
-              <p>...</p>
+              <h3 id="应对高并发大流量三种方法">应对高并发大流量三种方法：</h3>
+<ol>
+<li><strong>Scale-out（横向扩展）：</strong> 采用分布式部署的方式把流量分流开，让每个服务器承担一部分并发和流量。</li>
+<li><strong>缓存：</strong> 使用缓存来提高系统的性能。</li>
+<li><strong>异步</strong> 在某些场景下，未处理完让请求先返回，数据准备好之后，再通知请求方。</li>
+</ol>
+<h3 id="scale-up-vs-scale-out">Scale-up vs Scale-out</h3>
+<p><strong>Scale-up（纵向扩展）：</strong> 通过购买性能更好的硬件来提升系统的并发处理能力。<em>操作简单，但单机有极限</em><br>
+**Scale-out（横向扩展）：突破单机极限，系统设计更复杂。</p>
+<h3 id="使用缓存提升性能">使用缓存提升性能</h3>
+<h3 id="异步处理">异步处理</h3>
+<p><strong>异步</strong>是一种常见的高并发设计方法。</p>
+<h3 id="系统演进过程应该遵循的思路">系统演进过程应该遵循的思路：</h3>
+<ul>
+<li>最简单的系统设计满足业务需求和流量现状，选择最熟悉的技术体系。</li>
+<li>选择社区成熟的、团队熟悉的组件帮助我们解决问题，在没有合适的解决方案的前提下才会自己造轮子。</li>
+<li>当对架构小修小补无法满足需求时，考虑重构、重写等大的调整方式解决现有问题。</li>
+</ul>
+<blockquote>
+<p>高并发系统的演进应该是循序渐进，以解决系统中存在的问题为目的和驱动力的。</p>
+</blockquote>
 
             </div>
             
               <div class="tag-container">
                 
-                  <a href="https://hufeng028.github.io/XAK52Yt-j/" class="tag">
-                    mysql
+                  <a href="https://hufeng028.github.io/MXgVSzpl1/" class="tag">
+                    高并发
                   </a>
                 
               </div>
@@ -110,9 +133,9 @@
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://hufeng028.github.io/15-or-da-yi-wen-zhang-yi-ri-zhi-he-suo-yin-xiang-guan-wen-ti/">
+                <a href="https://hufeng028.github.io/22-or-mysql-you-na-xie-yin-zhen-zhi-ke-ti-gao-xing-neng-de-fang-fa/">
                   <h3 class="post-title">
-                    15 | 答疑文章（一）：日志和索引相关问题
+                    22 | MySQL有哪些“饮鸩止渴”提高性能的方法？
                   </h3>
                 </a>
               </div>

@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://hufeng028.github.io</id>
     <title>一念觀心</title>
-    <updated>2020-07-05T02:30:32.198Z</updated>
+    <updated>2020-07-06T07:03:18.955Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://hufeng028.github.io"/>
     <link rel="self" href="https://hufeng028.github.io/atom.xml"/>
@@ -10,6 +10,35 @@
     <logo>https://hufeng028.github.io/images/avatar.png</logo>
     <icon>https://hufeng028.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 一念觀心</rights>
+    <entry>
+        <title type="html"><![CDATA[01 | 高并发系统：它的通用设计方法是什么？]]></title>
+        <id>https://hufeng028.github.io/01-or-gao-bing-fa-xi-tong-ta-de-tong-yong-she-ji-fang-fa-shi-shi-me/</id>
+        <link href="https://hufeng028.github.io/01-or-gao-bing-fa-xi-tong-ta-de-tong-yong-she-ji-fang-fa-shi-shi-me/">
+        </link>
+        <updated>2020-07-06T06:27:55.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="应对高并发大流量三种方法">应对高并发大流量三种方法：</h3>
+<ol>
+<li><strong>Scale-out（横向扩展）：</strong> 采用分布式部署的方式把流量分流开，让每个服务器承担一部分并发和流量。</li>
+<li><strong>缓存：</strong> 使用缓存来提高系统的性能。</li>
+<li><strong>异步</strong> 在某些场景下，未处理完让请求先返回，数据准备好之后，再通知请求方。</li>
+</ol>
+<h3 id="scale-up-vs-scale-out">Scale-up vs Scale-out</h3>
+<p><strong>Scale-up（纵向扩展）：</strong> 通过购买性能更好的硬件来提升系统的并发处理能力。<em>操作简单，但单机有极限</em><br>
+**Scale-out（横向扩展）：突破单机极限，系统设计更复杂。</p>
+<h3 id="使用缓存提升性能">使用缓存提升性能</h3>
+<h3 id="异步处理">异步处理</h3>
+<p><strong>异步</strong>是一种常见的高并发设计方法。</p>
+<h3 id="系统演进过程应该遵循的思路">系统演进过程应该遵循的思路：</h3>
+<ul>
+<li>最简单的系统设计满足业务需求和流量现状，选择最熟悉的技术体系。</li>
+<li>选择社区成熟的、团队熟悉的组件帮助我们解决问题，在没有合适的解决方案的前提下才会自己造轮子。</li>
+<li>当对架构小修小补无法满足需求时，考虑重构、重写等大的调整方式解决现有问题。</li>
+</ul>
+<blockquote>
+<p>高并发系统的演进应该是循序渐进，以解决系统中存在的问题为目的和驱动力的。</p>
+</blockquote>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[22 | MySQL有哪些“饮鸩止渴”提高性能的方法？]]></title>
         <id>https://hufeng028.github.io/22-or-mysql-you-na-xie-yin-zhen-zhi-ke-ti-gao-xing-neng-de-fang-fa/</id>
@@ -153,15 +182,6 @@ call query_rewrite.flush_rewrite_rules();
         <link href="https://hufeng028.github.io/14-or-countzhe-me-man-wo-gai-zen-me-ban/">
         </link>
         <updated>2020-07-04T14:55:52.000Z</updated>
-        <content type="html"><![CDATA[<p>...</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[13 | 为什么表数据删掉一半，表文件大小不变？]]></title>
-        <id>https://hufeng028.github.io/13-or-wei-shi-me-biao-shu-ju-shan-diao-yi-ban-biao-wen-jian-da-xiao-bu-bian/</id>
-        <link href="https://hufeng028.github.io/13-or-wei-shi-me-biao-shu-ju-shan-diao-yi-ban-biao-wen-jian-da-xiao-bu-bian/">
-        </link>
-        <updated>2020-07-04T14:55:25.000Z</updated>
         <content type="html"><![CDATA[<p>...</p>
 ]]></content>
     </entry>
